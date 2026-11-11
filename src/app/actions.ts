@@ -110,3 +110,31 @@ export async function importarCsv(_: unknown, form: FormData) {
   revalidatePath("/pipeline");
   return { resultado: r };
 }
+
+const MOTIVOS: Record<string, string> = {
+  opt_out: "Este lead pediu para não ser contatado.",
+  bloqueado: "Este contato está na lista de bloqueio.",
+  sem_contato: "O lead não tem esse contato cadastrado.",
+  limite_diario: "Limite diário de envios atingido para este canal.",
+  fora_do_horario: "Fora do horário comercial.",
+  erro: "Falha no envio",
+};
+
+export async function enviarManual(leadId: string, _: unknown, form: FormData) {
+  const { enviar } = await import("@/lib/envio");
+  const canal = form.get("canal") === "email" ? "email" : "whatsapp";
+  const corpo = String(form.get("corpo") ?? "").trim();
+  if (!corpo) return { erro: "Escreva a mensagem." };
+  const db = await supabaseServer();
+  const r = await enviar(db, {
+    leadId,
+    canal,
+    corpo,
+    assunto: String(form.get("assunto") ?? "").trim() || undefined,
+    manual: true,
+    autor: "usuario",
+  });
+  revalidatePath(`/leads/${leadId}`);
+  if (r.ok) return { ok: true };
+  return { erro: `${MOTIVOS[r.motivo]}${r.detalhe ? `: ${r.detalhe}` : ""}` };
+}
