@@ -3,6 +3,7 @@ import { supabaseServer } from "@/lib/supabase/server";
 import { ROTULO_ETAPA, type Atividade, type Lead, type Mensagem } from "@/lib/types";
 import { adicionarNota, marcarOptOut } from "../../actions";
 import { SeletorEtapa } from "./seletor-etapa";
+import { EnviarForm } from "./enviar-form";
 
 export const dynamic = "force-dynamic";
 
@@ -63,6 +64,7 @@ export default async function LeadDetalhe({ params }: { params: Promise<{ id: st
           ))}
           {!mensagens.length && <p className="text-slate-500">Nenhuma mensagem ainda.</p>}
         </div>
+        {!l.opt_out && <EnviarForm leadId={l.id} temWhatsapp={!!l.telefone} temEmail={!!l.email} />}
 
         <h2 className="mb-2 mt-6 font-medium">Linha do tempo</h2>
         <form action={adicionarNota.bind(null, l.id)} className="mb-3 flex gap-2">

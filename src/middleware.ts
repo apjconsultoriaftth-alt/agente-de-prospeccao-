@@ -27,6 +27,6 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  // webhooks (/api/webhooks/*) e arquivos estáticos ficam de fora
-  matcher: ["/((?!api/webhooks|_next/static|_next/image|favicon.ico).*)"],
+  // webhooks, jobs (protegidos por segredo próprio), descadastro e arquivos estáticos ficam de fora
+  matcher: ["/((?!api/webhooks|api/jobs|api/publico|_next/static|_next/image|favicon.ico).*)"],
 };
